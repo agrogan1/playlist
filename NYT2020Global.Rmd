@@ -1,6 +1,6 @@
 ---
 title: "New York Times 2020 Global Playlist"
-author: "Slide Deck Created By Andy Grogan-Kaylor"
+subtitle: "Press *o* for *overview*"
 date: "`r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -24,10 +24,6 @@ xaringanExtra::use_animate_css()
 
 ```
 
-# How To Navigate
-
-* Use the <span style="font-size:100px">&#8678;</span> and <span style="font-size:100px">&#8680;</span> keys to move through the presentation.
-* Press *o* for *panel overview*.
 
 ```{r, echo=FALSE}
 
@@ -35,7 +31,59 @@ library(readxl)
 
 playlist <- read_excel("NewYorkTimes2020GlobalPlaylist.xlsx")
 
+save(playlist, file = "playlist.RData")
+
 ```
+
+# Songs
+
+```{r, fig.height=4, echo=FALSE, message=FALSE, warning=FALSE}
+
+library(countrycode)
+
+library(plotly)
+
+library(tidyr)
+
+playlist_longer <- playlist %>% 
+  pivot_longer(4:6) %>%
+  select(song, group, name, value) %>%
+  filter(!is.na(value))
+
+playlist_longer$value[playlist_longer$value == "England"] <- "UK"
+
+playlist_longer$country_iso <- countrycode(playlist_longer$value, 
+                                 'country.name', 
+                                 'iso3c')
+
+g <- list(showframe = TRUE, 
+          showcoastlines = TRUE, 
+          showcountries = TRUE,
+          showland = TRUE,
+          projection = list(type = 'orthographic',
+                            rotation = list(lon = 0,
+                                            lat = 0,
+                                            roll = 0)),
+          showland = TRUE,
+          showocean = TRUE,
+          bgcolor = "black",
+          landcolor = toRGB("white"))
+
+plot_geo(playlist_longer,
+         locations = ~country_iso,
+         text = ~paste(song,
+                       "\n", 
+                       group, 
+                       "\n", 
+                       value),
+         hoverinfo = 'text',
+         marker = list(size=10, color = "green")) %>%
+  layout(geo = g,
+         paper_bgcolor='#000000',
+         plot_bgcolor='#000000')
+
+```
+
 
 ```{r, echo=FALSE, results='asis'}
 

@@ -19,6 +19,8 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 
+[[Direct Link](./NYT2020Global.html)]
+
 ```{r}
 
 xaringanExtra::embed_xaringan(url = "NYT2020Global.html", ratio = "4:3")
